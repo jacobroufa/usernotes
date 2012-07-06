@@ -58,6 +58,12 @@ function usernotes_schema() {
         'default' => 0,
       ),
     ),
+    'foreign keys' => array(
+      'user' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),
     'primary key' => array('unid'),
   );
 
