@@ -11,3 +11,5 @@ dependencies[] = diff
 
 files[] = usernotes.install
 files[] = usernotes.module
+
+configure = admin/config/people/usernotes

@@ -22,14 +22,15 @@ function usernotes_entity_info() {
       'id' => 'unid',
       'revision' => 'vid',
       'label' => FALSE,
-      'bundle' => 'type',
+      'bundle' => 'unotes',
     ),
-    'bundles' => array(
-      'label' => 'Usernotes',
-      'admin' => array(
-        'path' => 'admin/config/people/usernotes',
-        'access arguments' => array('administer usernotes'),
-      ),
+    'bundles' => array(),
+    'bundle keys' => array(
+      'bundle' => 'unotes',
+    ),
+    'admin ui' => array(
+      'path' => 'admin/config/people/usernotes',
+      'access arguments' => array('administer usernotes'),
     ),
     'view modes' => array(
       'list' => array(
@@ -46,11 +47,23 @@ function usernotes_entity_info() {
 }
 
 /**
+ * Implements hook_entity_info_alter().
+ */
+function usernotes_entity_info_alter(&$entity_info) {
+  $entity_info['usernotes']['bundles'] = array(
+    'admin' => array(
+      'path' => 'admin/config/people/usernotes',
+      'access arguments' => array('administer usernotes'),
+    ),
+  );
+}
+
+/**
  * URI callback for Usernotes.
  */
 function usernotes_uri($usernotes) {
   return array(
-    'path' => 'user/' . $usernotes->uid . '/note/' . $usernotes->unid,
+    'path' => 'note/' . $usernotes->unid,
   );
 }
 
