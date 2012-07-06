@@ -22,7 +22,15 @@ function usernotes_entity_info() {
       'entity keys' => array(
         'id' => 'unid',
         'revision' => 'vid',
-        'label' => 'note',
+      ),
+      'bundles' => array(
+        'notes' => array(
+          'label' => 'Usernotes',
+          'admin' => array(
+            'path' => 'admin/config/people/usernotes',
+            'access arguments' => array('administer usernotes'),
+          ),
+        ),
       ),
       'view modes' => array(
         'list' => array(
@@ -46,19 +54,6 @@ function usernotes_uri($usernotes) {
   return array(
     'path' => 'user/' . $usernotes->uid . '/note/' . $usernotes->unid,
   );
-}
-
-/**
- * Implements entity_load().
- */
-function usernotes_load($unid = NULL, $reset = FALSE) {
-  $unids = (isset ($unid) ? array($unid) : array());
-  $usernotes = usernotes_load_multiple($unids, $reset);
-  return $usernotes ? reset ($usernotes) : FALSE;
-}
-
-function usernotes_load_multiple($unids = array(), $conditions = array(), $reset = FALSE) {
-  return entity_load('usernotes', $unids, $conditions, $reset);
 }
 
 /**
@@ -98,3 +93,58 @@ function usernotes_access($op, $usernotes = NULL, $account = NULL) {
   return FALSE;
 }
 
+/**
+ * Implements entity_load().
+ */
+function usernotes_load($unid = NULL, $reset = FALSE) {
+  $unids = (isset ($unid) ? array($unid) : array());
+  $usernotes = usernotes_load_multiple($unids, $reset);
+  return $usernotes ? reset ($usernotes) : FALSE;
+}
+
+function usernotes_load_multiple($unids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('usernotes', $unids, $conditions, $reset);
+}
+
+/**
+ * Implements entity_save().
+ */
+function usernotes_save($usernotes) {
+  if ($usernotes->is_new) {
+    $unid = db_insert('usernotes')
+      ->useDefaults(array('unid'))
+      ->fields(array(
+        'created' => REQUEST_TIME,
+        'changed' => REQUEST_TIME,
+        ))
+      ->execute();
+    $usernotes->unid = $unid;
+    $usernotes->revision = TRUE;
+  }
+  if (!empty($usernotes->revision)) {
+    $vid = db_insert('usernotes_revision')
+      ->useDefaults(array('vid'))
+      ->fields(array(
+        'unid' => $usernotes->unid,
+        'changed' => REQUEST_TIME,
+        ))
+      ->execute();
+      $usernotes->vid = $vid;
+    db_update('usernotes')
+      ->condition('unid', $usernotes->unid)
+      ->fields(array(
+        'vid' => $usernotes->vid,
+        ))
+      ->execute();
+  }
+  if ($usernotes->is_new) {
+    field_attach_insert('usernotes', $usernotes);
+  }
+  else {
+    field_attach_update('usernotes', $usernotes);
+  }
+
+  return $usernotes->unid;
+}
+
+?>
