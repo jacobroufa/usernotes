@@ -1,0 +1,13 @@
+name = Usernotes
+description = Allows notes to be attached to users.
+core = 7.x
+package = Other
+
+dependencies[] = user
+dependencies[] = entity
+dependencies[] = entityreference
+dependencies[] = ctools
+dependencies[] = diff
+
+files[] = usernotes.install
+files[] = usernotes.module

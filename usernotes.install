@@ -1,0 +1,105 @@
+<?php
+/**
+ * @file
+ * Installs the Usernotes module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function usernotes_schema() {
+  $schema = array();
+
+  $schema['usernotes'] = array(
+    'description' => 'The base table for Usernotes.',
+    'fields' => array(
+      'unid' => array(
+        'description' => 'The primary indentifier for a usernote.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'description' => 'The current {usernotes_revision}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'note' => array(
+        'description' => 'The note to be stored as plain text.',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the note was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the note was changed.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'important' => array(
+        'description' => 'Boolean indicating whether the note should float to the top of the list.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'uid' => array(
+        'description' => 'UID reference field attaching each note to a user. Not always the creator of the note. Doesn\'t change.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('unid'),
+  );
+
+  $schema['usernotes_revision'] = array(
+    'description' => 'Stores revision information for Usernotes.',
+    'fields' => array(
+      'unid' => array(
+        'description' => 'The primary indentifier for a usernote.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'description' => 'The current {usernotes_revision}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'note' => array(
+        'description' => 'The note to be stored as plain text.',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => TRUE,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the note was changed.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'important' => array(
+        'description' => 'Boolean indicating whether the note should float to the top of the list.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('unid', 'vid'),
+  );
+
+  return $schema;
+}
+?>

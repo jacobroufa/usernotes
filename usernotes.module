@@ -1,0 +1,100 @@
+<?php
+/*********
+ * Usernotes
+ *
+ * Provides an interface for easily attaching notes to a user.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function usernotes_entity_info() {
+  $usernotes_info = array(
+    'usernotes' = array(
+      'label' => t('Usernotes'),
+      'controller class' => 'EntityAPIController',
+      'entity class' => 'Entity',
+      'base table' => 'usernotes',
+      'revision table' => 'usernotes_revision',
+      'load hook' => 'usernotes_load',
+      'uri callback' => 'usernotes_uri',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'unid',
+        'revision' => 'vid',
+        'label' => 'note',
+      ),
+      'view modes' => array(
+        'list' => array(
+          'label' => t('Default'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'module' => 'usernotes',
+      'access callback' => 'usernotes_access',
+      'creation callback' => 'usernotes_create',
+    ),
+  );
+
+  return $usernotes_info;
+}
+
+/**
+ * URI callback for Usernotes.
+ */
+function usernotes_uri($usernotes) {
+  return array(
+    'path' => 'user/' . $usernotes->uid . '/note/' . $usernotes->unid,
+  );
+}
+
+/**
+ * Implements entity_load().
+ */
+function usernotes_load($unid = NULL, $reset = FALSE) {
+  $unids = (isset ($unid) ? array($unid) : array());
+  $usernotes = usernotes_load_multiple($unids, $reset);
+  return $usernotes ? reset ($usernotes) : FALSE;
+}
+
+function usernotes_load_multiple($unids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('usernotes', $unids, $conditions, $reset);
+}
+
+/**
+ * Implements hook_permission().
+ */
+function usernotes_permission() {
+  $permissions = array(
+    'administer usernotes' => array(
+      'title' => t('Administer Usernotes'),
+      'description' => t('Provides full access to Usernotes. Should only be given to administrators or staff roles.'),
+    ),
+    'own usernotes' => array(
+      'title' => t('Create, Edit, Delete and View Own Usernotes'),
+      'description' => t('Create, Edit, Delete and View Usernotes attached to your own account'),
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Access callback.
+ */
+function usernotes_access($op, $usernotes = NULL, $account = NULL) {
+  global $user;
+  if (!isset($account)) {
+    $account = $user;
+  }
+  if (user_access('administer usernotes', $account)) {
+    return TRUE;
+  }
+  if (isset($usernotes)) {
+    if (user_access('own usernotes', $account) && ($usernotes->uid == $account->uid)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
